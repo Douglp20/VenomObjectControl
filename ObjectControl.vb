@@ -5,13 +5,24 @@
     End Sub
     Public Function KeyPressNumeric(ByVal sender As Object, ByVal e As System.Windows.Forms.KeyPressEventArgs) As Boolean
         On Error GoTo Err
-
-        If Asc(e.KeyChar) <> 8 Then
-            If Asc(e.KeyChar) < 48 Or Asc(e.KeyChar) > 57 Then
+        If e.KeyChar = vbBack Then
+            e.Handled = False
+            KeyPressNumeric = False
+        Else
+            If Char.IsDigit(CChar(CStr(e.KeyChar))) = False Then
                 e.Handled = True
                 KeyPressNumeric = True
             End If
         End If
+
+
+
+        'If Asc(e.KeyChar) <> 8 Then
+        '    If Asc(e.KeyChar) < 48 Or Asc(e.KeyChar) > 57 Then
+        '        e.Handled = True
+        '        KeyPressNumeric = True
+        '    End If
+        'End If
 
         Exit Function
 
@@ -22,15 +33,28 @@ Err:
     End Function
     Public Function KeyPressMoney(ByVal sender As Object, ByVal e As System.Windows.Forms.KeyPressEventArgs) As Boolean
         On Error GoTo Err
-
-        If Asc(e.KeyChar) <> 8 Then
-            If Asc(e.KeyChar) <> 46 Then
-                If (Asc(e.KeyChar) < 48 Or Asc(e.KeyChar) > 57) Then
-                    e.Handled = True
+        If e.KeyChar = vbBack Then
+            e.Handled = False
+            KeyPressMoney = False
+        Else
+            If Asc(e.KeyChar) = 46 Then
+                e.Handled = False
+                KeyPressMoney = False
+            Else
+                If Char.IsDigit(CChar(CStr(e.KeyChar))) = False Then
+                e.Handled = True
                     KeyPressMoney = True
                 End If
             End If
         End If
+        'If Asc(e.KeyChar) <> 8 Then
+        '    If Asc(e.KeyChar) <> 46 Then
+        '        If (Asc(e.KeyChar) < 48 Or Asc(e.KeyChar) > 57) Then
+        '            e.Handled = True
+        '            KeyPressMoney = True
+        '        End If
+        '    End If
+        'End If
 
         Exit Function
 
@@ -39,7 +63,22 @@ Err:
         RaiseEvent ErrorMessage(Err.Description, Err.Number, rtn)
 
     End Function
+    Public Sub DatePickerValue(dte As System.Windows.Forms.DateTimePicker, DateValue As String)
+        On Error GoTo Err
+        If DateValue.ToString.Length > 0 Then
+            dte.Value = DateValue
+            If dte.ShowCheckBox Then dte.Checked = True
+        Else
+            If dte.ShowCheckBox Then dte.Checked = False
+        End If
 
+        Exit Sub
+
+Err:
+        Dim rtn As String = "The error occur within the module " + System.Reflection.MethodBase.GetCurrentMethod().Name + " : " + Me.ToString() + "."
+        RaiseEvent ErrorMessage(Err.Description, Err.Number, rtn)
+
+    End Sub
     Public Sub FullCapitalise(textbox As System.Windows.Forms.TextBox)
         On Error GoTo Err
 
@@ -159,8 +198,9 @@ Err:
 
         On Error GoTo Err
 
-
-        Return strValue.Contains("@")
+        If String.IsNullOrEmpty(strValue) = False Then
+            Return strValue.Contains("@")
+        End If
 
 
         Exit Function
