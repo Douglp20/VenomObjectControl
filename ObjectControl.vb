@@ -222,4 +222,32 @@ Err:
         Dim rtn As String = "The error occur with " + strValue + " within the module " + System.Reflection.MethodBase.GetCurrentMethod().Name + " : " + Me.ToString() + "."
         RaiseEvent ErrorMessage(Err.Description, Err.Number, rtn)
     End Function
+    Public Function GetFormatSplitValue(ByVal SplitValue As String, ByVal SplitItem As String) As ArrayList
+        'check the Web site is valid
+        Dim ReturnArray As New ArrayList
+        Dim SplitArray As Array
+        Dim SplitCount As Integer
+        'Dim r As Integer
+        On Error GoTo Err
+
+        SplitArray = SplitValue.Split(SplitItem)
+        SplitCount = SplitArray.Length
+        For r As Integer = 0 To SplitCount - 1
+            If SplitArray(r) = "All" Then
+            Else
+                ReturnArray.Add(SplitArray(r))
+            End If
+        Next
+
+
+        Return ReturnArray
+
+        Exit Function
+
+Err:
+        Dim rtn As String = "The error occur with " + SplitValue + " within the module " + System.Reflection.MethodBase.GetCurrentMethod().Name + " : " + Me.ToString() + "."
+        RaiseEvent ErrorMessage(Err.Description, Err.Number, rtn)
+    End Function
+
+
 End Class
