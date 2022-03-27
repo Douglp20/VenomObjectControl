@@ -3,6 +3,40 @@
     Public Event ErrorMessage(ByVal errDesc As String, ByVal errNo As Integer, ByVal errTrace As String)
     Public Sub New()
     End Sub
+#Region "Null"
+    Public Function StringIsNull(ByVal value As String) As String
+
+        On Error GoTo Err
+        If String.IsNullOrEmpty(value) Then
+            StringIsNull = String.Empty
+        Else
+            StringIsNull = value
+        End If
+
+        Exit Function
+
+Err:
+        Dim rtn As String = "The error occur within the module " + System.Reflection.MethodBase.GetCurrentMethod().Name + " : " + Me.ToString() + "."
+        RaiseEvent ErrorMessage(Err.Description, Err.Number, rtn)
+    End Function
+    Public Function DateIsNull(dte As System.Windows.Forms.DateTimePicker) As Object
+
+        On Error GoTo Err
+        If dte.Checked Then
+            DateIsNull = dte.Value
+        Else
+            DateIsNull = DBNull.Value ''.ToString()
+        End If
+
+        Exit Function
+
+Err:
+        Dim rtn As String = "The error occur within the module " + System.Reflection.MethodBase.GetCurrentMethod().Name + " : " + Me.ToString() + "."
+        RaiseEvent ErrorMessage(Err.Description, Err.Number, rtn)
+    End Function
+
+#End Region
+#Region "Keypress"
     Public Function KeyPressNumeric(ByVal sender As Object, ByVal e As System.Windows.Forms.KeyPressEventArgs) As Boolean
         On Error GoTo Err
         If e.KeyChar = vbBack Then
@@ -63,22 +97,9 @@ Err:
         RaiseEvent ErrorMessage(Err.Description, Err.Number, rtn)
 
     End Function
-    Public Sub DatePickerValue(dte As System.Windows.Forms.DateTimePicker, DateValue As String)
-        On Error GoTo Err
-        If DateValue.ToString.Length > 0 Then
-            dte.Value = DateValue
-            If dte.ShowCheckBox Then dte.Checked = True
-        Else
-            If dte.ShowCheckBox Then dte.Checked = False
-        End If
 
-        Exit Sub
-
-Err:
-        Dim rtn As String = "The error occur within the module " + System.Reflection.MethodBase.GetCurrentMethod().Name + " : " + Me.ToString() + "."
-        RaiseEvent ErrorMessage(Err.Description, Err.Number, rtn)
-
-    End Sub
+#End Region
+#Region "Wording"
     Public Sub FullCapitalise(textbox As System.Windows.Forms.TextBox)
         On Error GoTo Err
 
@@ -145,15 +166,83 @@ Err:
         Dim rtn As String = "The error occur within the module " + System.Reflection.MethodBase.GetCurrentMethod().Name + " : " + Me.ToString() + "."
         RaiseEvent ErrorMessage(Err.Description, Err.Number, rtn)
     End Sub
+#End Region
+#Region "Time and Date"
+    Public Function AddTimeToDateIsNull(dte As System.Windows.Forms.DateTimePicker, time As String) As Object
+        On Error GoTo Err
+        'time 11:00
+        Dim StartDate As DateTime = dte.Value
+        Dim strDateTime As String = CStr(Mid(StartDate, 1, 10))
+        Dim strHour As String = CStr(Mid(time, 1, 2))
+        Dim strMin As String = CStr(Mid(time, 4, 2))
+        Dim lngHour As Integer = CInt(Mid(time, 1, 2))
 
+        If dte.Checked Then
+            If lngHour >= 12 Then
+                strDateTime = "#" + strDateTime + " " + strHour + ":" + strMin + ":00 PM#"
+
+            Else
+                strDateTime = "#" + strDateTime + " " + strHour + ":" + strMin + ":00 AM#"
+            End If
+
+            AddTimeToDateIsNull = strDateTime
+
+        Else
+            AddTimeToDateIsNull = DBNull.Value
+
+        End If
+
+        Exit Function
+
+Err:
+        Dim rtn As String = "The error occur within the module " + System.Reflection.MethodBase.GetCurrentMethod().Name + " : " + Me.ToString() + "."
+        RaiseEvent ErrorMessage(Err.Description, Err.Number, rtn)
+    End Function
+    Public Sub DatePickerValue(dte As System.Windows.Forms.DateTimePicker, DateValue As String)
+        On Error GoTo Err
+        If DateValue.ToString.Length > 0 Then
+            dte.Value = DateValue
+            If dte.ShowCheckBox Then dte.Checked = True
+        Else
+            If dte.ShowCheckBox Then dte.Checked = False
+        End If
+
+        Exit Sub
+
+Err:
+        Dim rtn As String = "The error occur within the module " + System.Reflection.MethodBase.GetCurrentMethod().Name + " : " + Me.ToString() + "."
+        RaiseEvent ErrorMessage(Err.Description, Err.Number, rtn)
+
+    End Sub
     Public Sub TimeInterval(StartTime As DateTime, Interval As Integer, cbo As System.Windows.Forms.ComboBox)
         On Error GoTo Err
         'time
         Dim EndTime As DateTime = "#23:30:00 PM#"
 
+
         cbo.Items.Clear()
+        ' cbo.Items.Add("00:00")
+        For i As Integer = 0 To 150
+            cbo.Items.Add(StartTime.ToShortTimeString())
+            StartTime = DateAdd(DateInterval.Minute, Interval, StartTime)
+            If StartTime = EndTime Then Exit For
+        Next
 
 
+        Exit Sub
+
+Err:
+        Dim rtn As String = "The error occur within the module " + System.Reflection.MethodBase.GetCurrentMethod().Name + " : " + Me.ToString() + "."
+        RaiseEvent ErrorMessage(Err.Description, Err.Number, rtn)
+    End Sub
+    Public Sub TimeIntervalWithBlank(StartTime As DateTime, Interval As Integer, cbo As System.Windows.Forms.ComboBox)
+        On Error GoTo Err
+        'time
+        Dim EndTime As DateTime = "#23:30:00 PM#"
+
+
+        cbo.Items.Clear()
+        cbo.Items.Add("00:00")
         For i As Integer = 0 To 150
             cbo.Items.Add(StartTime.ToShortTimeString())
             StartTime = DateAdd(DateInterval.Minute, Interval, StartTime)
@@ -168,6 +257,91 @@ Err:
         RaiseEvent ErrorMessage(Err.Description, Err.Number, rtn)
     End Sub
 
+    Public Function GetTimeHours(StartTime As DateTime, EndTime As DateTime) As String
+        On Error GoTo Err
+        'time
+
+        Dim TTF As New TimeSpan
+        TTF = EndTime.Subtract(StartTime)
+        GetTimeHours = TTF.Hours.ToString("00") + "." + TTF.Minutes.ToString("00")
+
+
+        Exit Function
+
+Err:
+        Dim rtn As String = "The error occur within the module " + System.Reflection.MethodBase.GetCurrentMethod().Name + " : " + Me.ToString() + "."
+        RaiseEvent ErrorMessage(Err.Description, Err.Number, rtn)
+    End Function
+    Public Function getTotalHours(Value As ArrayList) As String
+        On Error GoTo Err
+        Dim MinTotal As Integer = 0
+        Dim FullTotalHours As String = "00.00"
+        Dim Min As Integer = 0
+        Dim Hour As Integer = 0
+        Dim HourToMin As Integer = 0
+        Dim arrValue As New ArrayList
+        For i As Integer = 0 To Value.Count - 1
+            If Len(Value(i)) = 5 Then
+                arrValue = GetFormatSplitValue(Value(i), ".")
+                HourToMin = Math.Floor(arrValue(0) * 60)
+                Min = arrValue(1)
+                MinTotal = MinTotal + (HourToMin + Min)
+            End If
+        Next
+        If MinTotal > 20 Then
+            'MinTotal = MinTotal Mod 1440
+            Hour = MinTotal \ 60
+            Min = MinTotal Mod 60
+            Return String.Format("{0:00}.{1:00}", Hour, Min)
+        Else
+            Return String.Format("{0:00}.{1:00}", 0, 0)
+        End If
+
+        Exit Function
+
+Err:
+        Dim rtn As String = "The error occur within the module " + System.Reflection.MethodBase.GetCurrentMethod().Name + " : " + Me.ToString() + "."
+        RaiseEvent ErrorMessage(Err.Description, Err.Number, rtn)
+    End Function
+    Public Function TotalHoursTest(Value As ArrayList) As String
+        On Error GoTo Err
+        Dim totMinTotal As Integer = 0
+        ' Dim FullTotalHours As String = "00.00"
+        Dim totMin As Integer = 0
+        Dim totHourToMin As Integer = 0
+        Dim arrValue As New ArrayList
+        'time
+
+        For i As Integer = 0 To Value.Count - 1
+            If Len(Value(i)) = 5 Then
+                arrValue = GetFormatSplitValue(Value(i), ".")
+                totHourToMin = Math.Floor(arrValue(0) * 60)
+                totMin = arrValue(1)
+                totMinTotal = totMinTotal + (totHourToMin + totMin)
+            End If
+        Next
+        If totMinTotal > 20 Then
+            totMinTotal = totMinTotal Mod 1440
+            totHourToMin = totMinTotal \ 60
+            totMin = totMinTotal Mod 60
+            ' FullTotalHours = String.Format("{0:00}:{1:00}", totHourToMin, totMin)
+            '    Return String.Format("{0:00}:{1:00}", totHourToMin, totMin) 'FullTotalHours.ToString()
+            'Else
+            '    Return FullTotalHours.ToString()
+        End If
+
+
+        'Hour = totMinTotal \ 60
+        'Minute = totMinTotal Mod 60
+
+
+        Exit Function
+
+Err:
+        Dim rtn As String = "The error occur within the module " + System.Reflection.MethodBase.GetCurrentMethod().Name + " : " + Me.ToString() + "."
+        RaiseEvent ErrorMessage(Err.Description, Err.Number, rtn)
+    End Function
+
     Public Function AddTimeToDate(StartDate As DateTime, time As String) As DateTime
         On Error GoTo Err
         'time 11:00
@@ -179,11 +353,9 @@ Err:
 
         If lngHour >= 12 Then
             strDateTime = "#" + strDateTime + " " + strHour + ":" + strMin + ":00 PM#"
-
         Else
             strDateTime = "#" + strDateTime + " " + strHour + ":" + strMin + ":00 AM#"
         End If
-
 
         AddTimeToDate = strDateTime
 
@@ -193,6 +365,10 @@ Err:
         Dim rtn As String = "The error occur within the module " + System.Reflection.MethodBase.GetCurrentMethod().Name + " : " + Me.ToString() + "."
         RaiseEvent ErrorMessage(Err.Description, Err.Number, rtn)
     End Function
+
+#End Region
+
+#Region "Checks"
     Public Function EmailCheck(ByVal strValue As String) As Boolean
         'check the email is valid
 
@@ -222,6 +398,9 @@ Err:
         Dim rtn As String = "The error occur with " + strValue + " within the module " + System.Reflection.MethodBase.GetCurrentMethod().Name + " : " + Me.ToString() + "."
         RaiseEvent ErrorMessage(Err.Description, Err.Number, rtn)
     End Function
+#End Region
+
+#Region "Format"
     Public Function GetFormatSplitValue(ByVal SplitValue As String, ByVal SplitItem As String) As ArrayList
         'check the Web site is valid
         Dim ReturnArray As New ArrayList
@@ -248,6 +427,6 @@ Err:
         Dim rtn As String = "The error occur with " + SplitValue + " within the module " + System.Reflection.MethodBase.GetCurrentMethod().Name + " : " + Me.ToString() + "."
         RaiseEvent ErrorMessage(Err.Description, Err.Number, rtn)
     End Function
-
+#End Region
 
 End Class
