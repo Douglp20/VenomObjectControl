@@ -51,13 +51,6 @@ Err:
 
 
 
-        'If Asc(e.KeyChar) <> 8 Then
-        '    If Asc(e.KeyChar) < 48 Or Asc(e.KeyChar) > 57 Then
-        '        e.Handled = True
-        '        KeyPressNumeric = True
-        '    End If
-        'End If
-
         Exit Function
 
 Err:
@@ -272,6 +265,28 @@ Err:
         Dim rtn As String = "The error occur within the module " + System.Reflection.MethodBase.GetCurrentMethod().Name + " : " + Me.ToString() + "."
         RaiseEvent ErrorMessage(Err.Description, Err.Number, rtn)
     End Function
+    Public Function GetTimeHours(StartTime As String, EndTime As String) As String
+        On Error GoTo Err
+        'time
+
+        If StartTime.Length = 5 And EndTime.Length = 5 Then
+            Dim ParseStartTime As DateTime = Date.Parse(StartTime)
+            Dim ParseEndTime As DateTime = Date.Parse(EndTime)
+
+            Dim TTF As New TimeSpan
+            TTF = ParseEndTime.Subtract(ParseStartTime)
+            GetTimeHours = TTF.Hours.ToString("00") + "." + TTF.Minutes.ToString("00")
+
+        Else
+            GetTimeHours = "00:00"
+        End If
+
+        Exit Function
+
+Err:
+        Dim rtn As String = "The error occur within the module " + System.Reflection.MethodBase.GetCurrentMethod().Name + " : " + Me.ToString() + "."
+        RaiseEvent ErrorMessage(Err.Description, Err.Number, rtn)
+    End Function
     Public Function getTotalHours(Value As ArrayList) As String
         On Error GoTo Err
         Dim MinTotal As Integer = 0
@@ -293,6 +308,41 @@ Err:
             Hour = MinTotal \ 60
             Min = MinTotal Mod 60
             Return String.Format("{0:00}.{1:00}", Hour, Min)
+        Else
+            Return String.Format("{0:00}.{1:00}", 0, 0)
+        End If
+
+        Exit Function
+
+Err:
+        Dim rtn As String = "The error occur within the module " + System.Reflection.MethodBase.GetCurrentMethod().Name + " : " + Me.ToString() + "."
+        RaiseEvent ErrorMessage(Err.Description, Err.Number, rtn)
+    End Function
+    Public Function TotalHours(Value As ArrayList) As String
+        On Error GoTo Err
+        'Dim MinTotal As Integer = 0
+        'Dim FullTotalHours As String = "00.00"
+        Dim Minute As Int32 = 0
+        Dim Hour As Int32 = 0
+        Dim MinuteTotal As Int32 = 0
+        Dim arrValue As New ArrayList
+        Dim newValue As String = String.Empty
+
+        For i As Integer = 0 To Value.Count - 1
+            If Len(Value(i)) = 5 Then
+                newValue = Value(i).ToString().Replace(".", "").Trim
+                If Int32.TryParse(newValue.Substring(0, 2), Hour) = True Then
+                    MinuteTotal = MinuteTotal + Math.Floor(Hour * 60)
+                End If
+                If Int32.TryParse(newValue.Substring(2, 2), Minute) = True Then
+                    MinuteTotal = MinuteTotal + Minute
+                End If
+            End If
+        Next
+        If MinuteTotal > 20 Then
+            Hour = MinuteTotal \ 60
+            Minute = MinuteTotal Mod 60
+            Return String.Format("{0:00}.{1:00}", Hour, Minute)
         Else
             Return String.Format("{0:00}.{1:00}", 0, 0)
         End If
@@ -369,6 +419,43 @@ Err:
 #End Region
 
 #Region "Checks"
+
+    Public Function KeyValidatingMaskedTime(ByVal sender As Object, ByVal e As System.ComponentModel.CancelEventArgs) As Boolean
+        Dim SenderName As String = sender.Name.ToString()
+        Dim value As String = String.Empty
+        Dim hour As Int32
+        Dim minute As Int32
+
+        On Error GoTo Err
+        value = sender.Text.ToString().Replace(":", "").Trim
+            If value = String.Empty Then Return KeyValidatingMaskedTime
+            If Int32.TryParse(value.Substring(0, 2), hour) = False Then
+            e.Cancel = True
+            KeyValidatingMaskedTime = True
+        Else
+            If hour < 0 OrElse hour > 23 Then
+                e.Cancel = True
+                KeyValidatingMaskedTime = True
+            End If
+        End If
+        If Int32.TryParse(value.Substring(2, 2), minute) = False Then
+            e.Cancel = True
+            KeyValidatingMaskedTime = True
+        Else
+            If minute < 0 OrElse minute > 59 Then
+                e.Cancel = True
+                KeyValidatingMaskedTime = True
+            End If
+        End If
+
+
+        Exit Function
+
+Err:
+            Dim rtn As String = "The error occur within the module " + System.Reflection.MethodBase.GetCurrentMethod().Name + " : " + Me.ToString() + "."
+            RaiseEvent ErrorMessage(Err.Description, Err.Number, rtn)
+    End Function
+
     Public Function EmailCheck(ByVal strValue As String) As Boolean
         'check the email is valid
 
@@ -399,6 +486,7 @@ Err:
         RaiseEvent ErrorMessage(Err.Description, Err.Number, rtn)
     End Function
 #End Region
+
 
 #Region "Format"
     Public Function GetFormatSplitValue(ByVal SplitValue As String, ByVal SplitItem As String) As ArrayList
