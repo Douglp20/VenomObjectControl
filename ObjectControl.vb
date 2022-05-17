@@ -270,15 +270,18 @@ Err:
         'time
 
         If StartTime.Length = 5 And EndTime.Length = 5 Then
-            Dim ParseStartTime As DateTime = Date.Parse(StartTime)
-            Dim ParseEndTime As DateTime = Date.Parse(EndTime)
+            If StartTime.ToString().Replace(":", "").Trim = "0000" OrElse EndTime.ToString().Replace(":", "").Trim = "0000" = False Then
+                Dim ParseStartTime As DateTime = Date.Parse(StartTime)
+                Dim ParseEndTime As DateTime = Date.Parse(EndTime)
 
-            Dim TTF As New TimeSpan
-            TTF = ParseEndTime.Subtract(ParseStartTime)
-            GetTimeHours = TTF.Hours.ToString("00") + "." + TTF.Minutes.ToString("00")
-
+                Dim TTF As New TimeSpan
+                TTF = ParseEndTime.Subtract(ParseStartTime)
+                GetTimeHours = TTF.Hours.ToString("00") + "." + TTF.Minutes.ToString("00")
+            Else
+                GetTimeHours = "00:00"
+            End If
         Else
-            GetTimeHours = "00:00"
+                GetTimeHours = "00:00"
         End If
 
         Exit Function
@@ -427,27 +430,31 @@ Err:
         Dim minute As Int32
 
         On Error GoTo Err
-        value = sender.Text.ToString().Replace(":", "").Trim
+        If Len(sender.Text.ToString()) = 5 Then
+            value = sender.Text.ToString().Replace(":", "").Trim
             If value = String.Empty Then Return KeyValidatingMaskedTime
             If Int32.TryParse(value.Substring(0, 2), hour) = False Then
-            e.Cancel = True
-            KeyValidatingMaskedTime = True
-        Else
-            If hour < 0 OrElse hour > 23 Then
                 e.Cancel = True
                 KeyValidatingMaskedTime = True
+            Else
+                If hour < 0 OrElse hour > 23 Then
+                    e.Cancel = True
+                    KeyValidatingMaskedTime = True
+                End If
             End If
-        End If
-        If Int32.TryParse(value.Substring(2, 2), minute) = False Then
-            e.Cancel = True
-            KeyValidatingMaskedTime = True
-        Else
-            If minute < 0 OrElse minute > 59 Then
+            If Int32.TryParse(value.Substring(2, 2), minute) = False Then
                 e.Cancel = True
                 KeyValidatingMaskedTime = True
+            Else
+                If minute < 0 OrElse minute > 59 Then
+                    e.Cancel = True
+                    KeyValidatingMaskedTime = True
+                End If
             End If
+        Else
+            e.Cancel = True
+            KeyValidatingMaskedTime = True
         End If
-
 
         Exit Function
 
