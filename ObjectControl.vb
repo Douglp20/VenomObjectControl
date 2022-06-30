@@ -69,19 +69,11 @@ Err:
                 KeyPressMoney = False
             Else
                 If Char.IsDigit(CChar(CStr(e.KeyChar))) = False Then
-                e.Handled = True
+                    e.Handled = True
                     KeyPressMoney = True
                 End If
             End If
         End If
-        'If Asc(e.KeyChar) <> 8 Then
-        '    If Asc(e.KeyChar) <> 46 Then
-        '        If (Asc(e.KeyChar) < 48 Or Asc(e.KeyChar) > 57) Then
-        '            e.Handled = True
-        '            KeyPressMoney = True
-        '        End If
-        '    End If
-        'End If
 
         Exit Function
 
