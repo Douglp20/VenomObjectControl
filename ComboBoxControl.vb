@@ -1,4 +1,4 @@
-﻿Public Class ComboBox
+﻿Public Class ComboBoxControl
     Public Event ErrorMessage(ByVal errDesc As String, ByVal errNo As Integer, ByVal errTrace As String)
     Public Sub New()
     End Sub
