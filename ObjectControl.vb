@@ -182,33 +182,41 @@ Err:
             RaiseEvent ErrorMessage(Err.Description, Err.Number, rtn)
     End Function
 
-    Public Function EmailCheck(ByVal strValue As String) As Boolean
+    Public Function EmailCheck(ByVal Value As String) As Boolean
         'check the email is valid
+        Dim ReturnValue As Boolean = True
 
         On Error GoTo Err
 
-        If String.IsNullOrEmpty(strValue) = False Then
-            Return strValue.Contains("@")
+        If String.IsNullOrEmpty(Value) = False Then
+            ReturnValue = Value.Contains("@")
+        End If
+
+        Return ReturnValue
+
+        Exit Function
+
+Err:
+        Dim rtn As String = "The error occur with " + Value + " within the module " + System.Reflection.MethodBase.GetCurrentMethod().Name + " : " + Me.ToString() + "."
+        RaiseEvent ErrorMessage(Err.Description, Err.Number, rtn)
+    End Function
+    Public Function WWWCheck(ByVal Value As String) As Boolean
+        'check the Web site is valid
+
+        Dim ReturnValue As Boolean = True
+
+        On Error GoTo Err
+
+        If String.IsNullOrEmpty(Value) = False Then
+            ReturnValue = Value.Contains(".com") Or Value.Contains(".uk")
         End If
 
 
-        Exit Function
-
-Err:
-        Dim rtn As String = "The error occur with " + strValue + " within the module " + System.Reflection.MethodBase.GetCurrentMethod().Name + " : " + Me.ToString() + "."
-        RaiseEvent ErrorMessage(Err.Description, Err.Number, rtn)
-    End Function
-    Public Function WWWCheck(ByVal strValue As String) As Boolean
-        'check the Web site is valid
-
-        On Error GoTo Err
-
-        Return strValue.Contains(".com") Or strValue.Contains(".uk")
 
         Exit Function
 
 Err:
-        Dim rtn As String = "The error occur with " + strValue + " within the module " + System.Reflection.MethodBase.GetCurrentMethod().Name + " : " + Me.ToString() + "."
+        Dim rtn As String = "The error occur with " + Value + " within the module " + System.Reflection.MethodBase.GetCurrentMethod().Name + " : " + Me.ToString() + "."
         RaiseEvent ErrorMessage(Err.Description, Err.Number, rtn)
     End Function
 #End Region
