@@ -1,4 +1,7 @@
-﻿Public Class ObjectControl
+﻿Imports System.IO
+Imports System.Drawing
+
+Public Class ObjectControl
 
     Public Event ErrorMessage(ByVal errDesc As String, ByVal errNo As Integer, ByVal errTrace As String)
     Public Sub New()
@@ -44,6 +47,14 @@ Err:
         RaiseEvent ErrorMessage(Err.Description, Err.Number, rtn)
 
     End Function
+    Function ImageFromBytes(ByVal bytes As Byte()) As System.Drawing.Image
+        Using ms As New MemoryStream(bytes)
+            Return Image.FromStream(ms)
+        End Using
+
+    End Function
+
+
     Public Function KeyPressMoney(ByVal sender As Object, ByVal e As System.Windows.Forms.KeyPressEventArgs) As Boolean
         On Error GoTo Err
         If e.KeyChar = vbBack Then
@@ -178,8 +189,8 @@ Err:
         Exit Function
 
 Err:
-            Dim rtn As String = "The error occur within the module " + System.Reflection.MethodBase.GetCurrentMethod().Name + " : " + Me.ToString() + "."
-            RaiseEvent ErrorMessage(Err.Description, Err.Number, rtn)
+        Dim rtn As String = "The error occur within the module " + System.Reflection.MethodBase.GetCurrentMethod().Name + " : " + Me.ToString() + "."
+        RaiseEvent ErrorMessage(Err.Description, Err.Number, rtn)
     End Function
 
     Public Function EmailCheck(ByVal Value As String) As Boolean
