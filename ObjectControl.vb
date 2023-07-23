@@ -1,5 +1,5 @@
-﻿Imports System.IO
-Imports System.Drawing
+﻿Imports System.Drawing
+Imports System.IO
 
 Public Class ObjectControl
 

@@ -22,27 +22,30 @@ Err:
     Public Function AddTimeToDateIsNull(dte As System.Windows.Forms.DateTimePicker, time As String) As Object
         On Error GoTo Err
         'time 11:00
-        Dim StartDate As DateTime = dte.Value
-        Dim strDateTime As String = CStr(Mid(StartDate, 1, 10))
-        Dim strHour As String = CStr(Mid(time, 1, 2))
-        Dim strMin As String = CStr(Mid(time, 4, 2))
-        Dim lngHour As Integer = CInt(Mid(time, 1, 2))
+        If time.Length > 0 Then
+            Dim StartDate As DateTime = dte.Value
+            Dim strDateTime As String = CStr(Mid(StartDate, 1, 10))
+            Dim strHour As String = CStr(Mid(time, 1, 2))
+            Dim strMin As String = CStr(Mid(time, 4, 2))
+            Dim lngHour As Integer = CInt(Mid(time, 1, 2))
 
-        If dte.Checked Then
-            If lngHour >= 12 Then
-                strDateTime = "#" + strDateTime + " " + strHour + ":" + strMin + ":00 PM#"
+            If dte.Checked Then
+                If lngHour >= 12 Then
+                    strDateTime = "#" + strDateTime + " " + strHour + ":" + strMin + ":00 PM#"
+
+                Else
+                    strDateTime = "#" + strDateTime + " " + strHour + ":" + strMin + ":00 AM#"
+                End If
+
+                AddTimeToDateIsNull = strDateTime
 
             Else
-                strDateTime = "#" + strDateTime + " " + strHour + ":" + strMin + ":00 AM#"
+                AddTimeToDateIsNull = DBNull.Value
+
             End If
-
-            AddTimeToDateIsNull = strDateTime
-
         Else
             AddTimeToDateIsNull = DBNull.Value
-
         End If
-
         Exit Function
 
 Err:
@@ -258,19 +261,21 @@ Err:
     Public Function AddTimeToDate(StartDate As DateTime, time As String) As DateTime
         On Error GoTo Err
         'time 11:00
-        Dim strDateTime As String = CStr(Mid(StartDate, 1, 10))
-        Dim strHour As String = CStr(Mid(time, 1, 2))
-        Dim strMin As String = CStr(Mid(time, 4, 2))
-        Dim lngHour As Integer = CInt(Mid(time, 1, 2))
+        If time.Length > 0 Then
+            Dim strDateTime As String = CStr(Mid(StartDate, 1, 10))
+            Dim strHour As String = CStr(Mid(time, 1, 2))
+            Dim strMin As String = CStr(Mid(time, 4, 2))
+            Dim lngHour As Integer = CInt(Mid(time, 1, 2))
 
 
-        If lngHour >= 12 Then
-            strDateTime = "#" + strDateTime + " " + strHour + ":" + strMin + ":00 PM#"
-        Else
-            strDateTime = "#" + strDateTime + " " + strHour + ":" + strMin + ":00 AM#"
+            If lngHour >= 12 Then
+                strDateTime = "#" + strDateTime + " " + strHour + ":" + strMin + ":00 PM#"
+            Else
+                strDateTime = "#" + strDateTime + " " + strHour + ":" + strMin + ":00 AM#"
+            End If
+
+            AddTimeToDate = strDateTime
         End If
-
-        AddTimeToDate = strDateTime
 
         Exit Function
 
