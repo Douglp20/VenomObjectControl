@@ -109,15 +109,19 @@ Err:
         Dim other_letter As String = ""
         Dim result As String = ""
 
-        If len > 1 Then
+        If String.IsNullOrEmpty(txt) Then
+            result = String.Empty
+        Else
+
             first_letter = txt.Substring(0, 1).ToUpper()
             other_letter = txt.Substring(1, len - 1).ToLower()
             result = first_letter.ToString() + other_letter.ToString()
-        Else
-            result = txt.Substring(0, 1).ToUpper()
+
+            textbox.Text = result
+            textbox.SelectionStart = len
+
         End If
-        textbox.Text = result
-        textbox.SelectionStart = len
+
         Exit Sub
 
 Err:
